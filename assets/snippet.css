@@ -1,0 +1,22 @@
+div.markdown-rendered table.table-editor tr.stm > td.stm-value,
+div.markdown-rendered table.table-editor tr.stm > td > .stm-value {
+	padding: 4px 12px;
+	font-weight: calc(var(--font-weight) + var(--bold-modifier));
+}
+div.markdown-rendered table.table-editor tr.stm > td.stm-value + .table-cell-wrapper,
+div.markdown-rendered table.table-editor tr.stm > td > .stm-value + .table-cell-wrapper {
+	display: none;
+}
+div.markdown-rendered table.table-editor tr.stm > td:focus-within > .stm-value {
+	display: none;
+}
+div.markdown-rendered table.table-editor tr.stm:last-of-type:not(.off) {
+	background-color: var(--background-secondary);
+}
+div.el-table > table tr.stm > td.stm-value,
+div.el-table > table tr.stm > td > .stm-value {
+	font-weight: calc(var(--font-weight) + var(--bold-modifier));
+}
+div.el-table > table tr.stm:last-of-type:not(.off) {
+	background-color: var(--background-secondary);
+}

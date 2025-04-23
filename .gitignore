@@ -1,0 +1,9 @@
+.vscode
+.idea
+.DS_Store
+.env
+*.iml
+*.map
+node_modules
+dist
+data.json
