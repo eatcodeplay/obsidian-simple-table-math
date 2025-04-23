@@ -88,7 +88,7 @@ You can use this class to style the cells in your tables. By default, these cell
 If the last row of a table contains calculations, it will be styled with a background color to make it easier to see the results.
 You can disable this behavior in the plugin settings or write your own CSS snippet to override it.
 
-You can find an example CSS snippet in the [assets/snippet.css](snippet.css) file.
+You can find an example CSS snippet in the [snippet.css](https://github.com/eatcodeplay/obsidian-simple-table-math/blob/0.1.0/assets/snippet.css) file.
 
 ## Gotchas & Known Issues
 
@@ -102,7 +102,7 @@ You can find an example CSS snippet in the [assets/snippet.css](snippet.css) fil
 This Plugin is currently not available in the Obsidian Community Plugins.
 You can install it manually by following the instructions below:
 
-1.  Download the latest release from the [Releases](https://github.com/YourUsername/obsidian-simple-table-math/releases) page.
+1.  Download the latest release from the [Releases](https://github.com/eatcodeplay/obsidian-simple-table-math/releases) page.
 2.  Extract the downloaded ZIP file into your Obsidian vault's plugins folder (e.g., `<your_vault>/.obsidian/plugins/obsidian-simple-table-math`).
 3.  **Note:** On some operating systems, the `.obsidian` folder might be hidden. Make sure to show hidden files in your file explorer.
 4.  Open Obsidian.
@@ -112,7 +112,7 @@ You can install it manually by following the instructions below:
 
 ## Contributing
 
-If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/YourUsername/obsidian-simple-table-math).
+If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/eatcodeplay/obsidian-simple-table-math/).
 
 ## License
 
