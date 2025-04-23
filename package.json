@@ -1,0 +1,33 @@
+{
+	"name": "obsidian-simple-table-math",
+	"version": "0.1.0",
+	"description": "Do some math (sum, average, etc.) in your markdown tables for Obsidian (https://obsidian.md).",
+	"main": "src/main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"test": "tsc -noEmit -skipLibCheck",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
+	"engines": {
+		"node": ">=20.x"
+	},
+	"keywords": [],
+	"author": "Sandro Ducceschi",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/lodash": "^4.17.16",
+		"@types/node": "^16.11.6",
+		"@typescript-eslint/eslint-plugin": "5.29.0",
+		"@typescript-eslint/parser": "5.29.0",
+		"builtin-modules": "3.3.0",
+		"dotenv": "^16.5.0",
+		"esbuild": "0.17.3",
+		"esbuild-sass-plugin": "2.4.5",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "4.7.4"
+	},
+	"dependencies": {
+	}
+}

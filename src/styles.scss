@@ -1,0 +1,37 @@
+div.markdown-rendered table.table-editor {
+	tr.stm > td {
+		&.stm-value, & > .stm-value {
+			padding: 4px 12px;
+			font-weight: calc(var(--font-weight) + var(--bold-modifier));
+
+			& + .table-cell-wrapper	 {
+				display: none;
+			}
+		}
+		&:focus-within {
+			& > .stm-value {
+				display: none;
+			}
+		}
+	}
+	tr.stm:last-of-type:not(.off) {
+		background-color: var(--background-secondary);
+	}
+}
+
+div.el-table > table {
+	tr.stm > td {
+		&.stm-value, & > .stm-value {
+			font-weight: calc(var(--font-weight) + var(--bold-modifier));
+		}
+	}
+	tr.stm:last-of-type:not(.off) {
+		background-color: var(--background-secondary);
+	}
+}
+
+.stm-copy-success {
+	position: relative;
+	top: -3px;
+	margin-left: 8px;
+}

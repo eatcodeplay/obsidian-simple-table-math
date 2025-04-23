@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-simple-table-math",
+	"name": "Simple Table Math",
+	"version": "0.1.0",
+	"minAppVersion": "1.8.9",
+	"description": "Do some math (sum, average, etc.) in your markdown tables.",
+	"author": "Sandro Ducceschi",
+	"authorUrl": "https://github.com/eatcodeplay/obsidian-simple-table-math",
+	"isDesktopOnly": false
+}
