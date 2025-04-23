@@ -4,7 +4,7 @@ A plugin for Obsidian that performs mathematical operations on Markdown tables.
 It dynamically calculates and displays results within your tables as you edit them.
 You can also copy the results to your clipboard.
 
-![Example of Simple Table Math in action](https://raw.githubusercontent.com/YourUsername/obsidian-simple-table-math/master/images/example.gif)
+https://github.com/user-attachments/assets/af3b295f-5bbd-497f-b507-696e9fcbb690
 
 ## How to Use
 
