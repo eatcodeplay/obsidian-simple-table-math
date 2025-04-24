@@ -2,13 +2,13 @@
 
 A plugin for Obsidian that performs mathematical operations on Markdown tables.
 It dynamically calculates and displays results within your tables as you edit them.
-You can also copy the results to your clipboard.
+You can also copy the results to your clipboard, either via a keyboard shortcut or via the context menu.
 
 https://github.com/user-attachments/assets/af3b295f-5bbd-497f-b507-696e9fcbb690
 
 ## How to Use
 
-Simple Table Math allows you to perform calculations (sum, average, minimum, maximum, subtraction, multiplication) on columns or rows of numbers within your Markdown tables.
+The plugin allows you to perform calculations (sum, average, minimum, maximum, subtraction, multiplication) on columns or rows of numbers within your Markdown tables.
 To trigger a calculation, place a special tag within a table cell.
 
 The tag follows this format: `[operation][direction][start:end][currency]`
@@ -70,40 +70,41 @@ The tag follows this format: `[operation][direction][start:end][currency]`
 * **Optional Range Selection:** Target specific cells for your calculations.
 * **Currency Formatting:** Display results with currency symbols for better readability.
 * **Locale-Aware Formatting:** Respects your system's locale for number formatting by default, with an option to override.
-* **Copy Results:** When copying a cell containing a calculated value (using `Ctrl + C` or `⌘ + C`), the numerical result will be copied to your clipboard.
+* **Copy Results:** When copying a cell containing an operation (using `Ctrl + C` or `⌘ + C`) or the context menu, the calculated result will be copied to your clipboard.
 
 ## Settings
 
-You can configure Simple Table Math in the Obsidian settings under "Simple Table Math". 
+You can configure the plugin in the Obsidian settings under "Simple Table Math". 
 The following options are available:
 
 * **Fractions:** Set the number of decimal places to display in the calculated results.
-* **Number formatting:** Enter a locale code (e.g., `en-US`, `de-DE`) to override the default number formatting. If left blank it will use the languagae defined for Obsidian.
+* **Number formatting:** Enter a locale code (e.g., `en-US`, `de-DE`) to override the default number formatting. If left blank, it will use the language defined for Obsidian.
+* **Highlight last row calculations:** Enable or disable styling for the last row in tables that contain calculations.
 
 ## CSS Look & Feel
 
-Simple Table Math will add a CSS class `.stm-value` to every cell containing a calculated value.
+Simple Table Math adds the CSS class `.stm-value` to every cell containing a calculated value.
 You can use this class to style the cells in your tables. By default, these cells will be styled with a bolder font weight.
 
 If the last row of a table contains calculations, it will be styled with a background color to make it easier to see the results.
 You can disable this behavior in the plugin settings or write your own CSS snippet to override it.
 
-You can find an example CSS snippet in the [snippet.css](https://github.com/eatcodeplay/obsidian-simple-table-math/blob/0.1.0/assets/snippet.css) file.
+For the adventurous: any row that contains calculations will also get a `.stm-row` class.
+
+You can find an example CSS snippet in the [snippet.css](https://github.com/eatcodeplay/obsidian-simple-table-math/blob/main/assets/snippet.css) file.
 
 ## Gotchas & Known Issues
 
-* **Any column found it the calculation path, will be included in the result.**
+* **Any column found in the calculation path will be included in the result.**
   * If your headers contain numbers, make sure exclude them from calculations by using range selection.
-* **MOBILE:** Switching between Reading-Mode and Editing-Mode can result in the column not rerendering correctly.
-  * Touching/Clicking inside the table or outside should solve that.
 
 ## Installation
 
-This Plugin is currently not available in the Obsidian Community Plugins.
-You can install it manually by following the instructions below:
+This plugin is currently not available in the Obsidian Community Plugins.
+You can install it either by using [BRAT](https://obsidian.md/plugins?id=obsidian42-brat) or manually by following the instructions below:
 
 1.  Download the latest release from the [Releases](https://github.com/eatcodeplay/obsidian-simple-table-math/releases) page.
-2.  Extract the downloaded ZIP file into your Obsidian vault's plugins folder (e.g., `<your_vault>/.obsidian/plugins/obsidian-simple-table-math`).
+2.  Extract the downloaded ZIP content into a new folder in your Obsidian vault's plugins folder (e.g., `<your_vault>/.obsidian/plugins/obsidian-simple-table-math`).
 3.  **Note:** On some operating systems, the `.obsidian` folder might be hidden. Make sure to show hidden files in your file explorer.
 4.  Open Obsidian.
 5.  Go to `Settings` -> `Community plugins`.
