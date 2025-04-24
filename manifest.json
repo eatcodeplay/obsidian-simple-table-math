@@ -5,6 +5,6 @@
 	"minAppVersion": "1.8.9",
 	"description": "Do some math (sum, average, etc.) in your markdown tables.",
 	"author": "Sandro Ducceschi",
-	"authorUrl": "https://github.com/eatcodeplay/obsidian-simple-table-math",
+	"authorUrl": "https://eatcodeplay.dev",
 	"isDesktopOnly": false
 }
