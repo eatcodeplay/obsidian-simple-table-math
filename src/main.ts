@@ -5,6 +5,8 @@ import {
 	getIcon,
 	getLanguage,
 	MarkdownView,
+	Menu,
+	MenuItem,
 	Notice,
 	Plugin,
 	PluginSettingTab,
@@ -41,20 +43,25 @@ const createFragment = (htmlstr: string) => {
  * The plugin actively listens to user interactions and processes table data accordingly.
  */
 export default class SimpleTableMath extends Plugin {
-	//----------------------------------
-	// Variables
-	//----------------------------------
+	//---------------------------------------------------
+	//
+	//  Variables
+	//
+	//---------------------------------------------------
 	workspace: Workspace;
 	layoutChangeEventRef: EventRef;
 	editorChangeEventRef: EventRef;
+	editorMenuEventRef: EventRef;
 	debouncedProcessing: () => void;
 	settings: SimpleTableMathSettings;
 	preventProcessing: boolean = false;
 	forceProcessing: boolean = false;
 
-	//----------------------------------
-	// Plugin Lifecycle Methods
-	//----------------------------------
+	//---------------------------------------------------
+	//
+	//  Plugin Lifecycle
+	//
+	//---------------------------------------------------
 	async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new SettingTab(this.app, this));
@@ -65,6 +72,7 @@ export default class SimpleTableMath extends Plugin {
 
 		this.editorChangeEventRef = this.workspace.on('layout-change', this.debouncedProcessing);
 		this.layoutChangeEventRef = this.workspace.on('editor-change', this.debouncedProcessing);
+		this.editorMenuEventRef = this.workspace.on('editor-menu', this.handleEditorMenuEvent.bind(this));
 
 		app.scope.register(null, 'Tab', this.debouncedProcessing);
 		app.scope.register(null, 'ArrowLeft', this.debouncedProcessing);
@@ -73,43 +81,28 @@ export default class SimpleTableMath extends Plugin {
 		app.scope.register(null, 'ArrowDown', this.debouncedProcessing);
 
 		this.registerDomEvent(document, 'click', this.debouncedProcessing);
-		this.registerDomEvent(document, 'keydown', (evt) => {
-			const isCopy = (evt.ctrlKey || evt.metaKey) && evt.key === 'c';
-			if (isCopy) {
-				this.process();
-				this.copyResult();
-			}
-		});
+		this.registerDomEvent(document, 'keydown', this.handleKeyDownEvent.bind(this));
 
 		this.workspace.on('file-open', () => {
 			this.forceProcessing = true;
-			this.process();
+			this.debouncedProcessing();
 		});
 	}
 
 	onunload() {
 		this.workspace.offref(this.layoutChangeEventRef);
 		this.workspace.offref(this.editorChangeEventRef);
+		this.workspace.offref(this.editorMenuEventRef);
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-		const trs = document.querySelectorAll('tr.stm');
-		trs.forEach((tr) => {
-			if (this.settings.styleLastRow) {
-				tr.classList.remove('off');
-			} else {
-				tr.classList.add('off');
-			}
-		})
-	}
+	//---------------------------------------------------
+	//
+	//  Methods
+	//
+	//---------------------------------------------------
 
 	//----------------------------------
-	// Table Processing Method
+	// Table Processing
 	//----------------------------------
 	process() {
 		if (!this.preventProcessing) {
@@ -132,7 +125,7 @@ export default class SimpleTableMath extends Plugin {
 			}
 
 			const rowClasses = [
-				'stm',
+				'stm-row',
 				...(this.settings.styleLastRow ? [] :  ['off']),
 			];
 
@@ -227,7 +220,8 @@ export default class SimpleTableMath extends Plugin {
 								}
 
 								if (vElement) {
-									cell.classList.add('stm');
+									cell.classList.add('stm-cell');
+									cell.tabIndex = -1;
 									cell.closest('tr')?.classList.add(...rowClasses);
 									const defaultLocale = getLanguage();
 									vElement.innerText = result.toLocaleString(this.settings.locale || defaultLocale, {
@@ -238,7 +232,7 @@ export default class SimpleTableMath extends Plugin {
 									});
 								}
 							}
-						} else if (!isActiveElement && cell.classList.contains('stm')) {
+						} else if (!isActiveElement && cell.classList.contains('stm-cell')) {
 							let vElement = cell.querySelector('div.stm-value') as HTMLElement | null;
 							if (vElement) {
 								cell.removeChild(vElement);
@@ -258,22 +252,74 @@ export default class SimpleTableMath extends Plugin {
 		this.preventProcessing = false;
 	}
 
-	copyResult() {
-		const column = document.activeElement?.closest('td, th');
-		if (column) {
-			const value = column.querySelector('.stm-value') as HTMLElement | null;
-			if (value) {
-				setTimeout(() => {
-					let html = '';
+	//----------------------------------
+	// Settings Methods
+	//----------------------------------
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
 
-					const icon = getIcon('copy-check');
-					if (icon) {
-						html += icon.outerHTML;
-					}
-					const fragment = createFragment(`${html}<span class="stm-copy-success">Copied!</span>`);
-					new Notice(fragment, 1000);
-					navigator.clipboard.writeText(value.textContent || '');
-				}, 25);
+	async saveSettings() {
+		await this.saveData(this.settings);
+		const trs = document.querySelectorAll('tr.stm-row');
+		trs.forEach((tr) => {
+			if (this.settings.styleLastRow) {
+				tr.classList.remove('off');
+			} else {
+				tr.classList.add('off');
+			}
+		})
+	}
+
+	//----------------------------------
+	// UI Methods
+	//----------------------------------
+	showNotice(message: string, icon: string | null = null, duration: number = 1000) {
+		let svg = '';
+		if (icon) {
+			const svgEl = getIcon(icon);
+			if (svgEl) {
+				svg = svgEl.outerHTML;
+			}
+		}
+		new Notice(
+			createFragment(`${svg}<span class="stm-notice">${message}</span>`),
+			duration,
+		);
+	}
+
+	//----------------------------------
+	// Event Handlers
+	//----------------------------------
+	handleEditorMenuEvent(menu: Menu) {
+		const cell = document.activeElement?.closest('td.stm-cell');
+		const value = cell?.querySelector('.stm-value') as HTMLElement | null;
+		if (value) {
+			menu.addItem((item: MenuItem) => {
+				item
+					.setTitle('Copy calculated value')
+					.setIcon('square-equal')
+					.onClick(async () => {
+						navigator.clipboard.writeText(value.textContent || '');
+						this.showNotice('Copied!', 'copy-check');
+					});
+			});
+		}
+	}
+
+	handleKeyDownEvent(evt: KeyboardEvent) {
+		const isCopy = (evt.ctrlKey || evt.metaKey) && evt.key === 'c';
+		if (isCopy) {
+			this.process();
+			const cell = document.activeElement?.closest('td.stm-cell, th.stm-cell');
+			if (cell) {
+				const value = cell.querySelector('.stm-value') as HTMLElement | null;
+				if (value) {
+					setTimeout(() => {
+						navigator.clipboard.writeText(value.textContent || '');
+						this.showNotice('Copied!', 'copy-check');
+					}, 25);
+				}
 			}
 		}
 	}

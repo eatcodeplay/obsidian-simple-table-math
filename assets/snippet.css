@@ -1,22 +1,30 @@
-div.markdown-rendered table.table-editor tr.stm > td.stm-value,
-div.markdown-rendered table.table-editor tr.stm > td > .stm-value {
+/* -------------------------------
+  Source / Live View Styles
+------------------------------- */
+
+/* Styles the value cells of a table with calculated values */
+div.markdown-rendered table.table-editor tr > td.stm-cell.stm-value,
+div.markdown-rendered table.table-editor tr > td.stm-cell > .stm-value {
 	padding: 4px 12px;
 	font-weight: calc(var(--font-weight) + var(--bold-modifier));
 }
-div.markdown-rendered table.table-editor tr.stm > td.stm-value + .table-cell-wrapper,
-div.markdown-rendered table.table-editor tr.stm > td > .stm-value + .table-cell-wrapper {
-	display: none;
-}
-div.markdown-rendered table.table-editor tr.stm > td:focus-within > .stm-value {
-	display: none;
-}
-div.markdown-rendered table.table-editor tr.stm:last-of-type:not(.off) {
+
+/* Styles the last row of a table with calculated values */
+div.markdown-rendered table.table-editor tr.stm-row:last-of-type:not(.off) {
 	background-color: var(--background-secondary);
 }
-div.el-table > table tr.stm > td.stm-value,
-div.el-table > table tr.stm > td > .stm-value {
+
+/* -------------------------------
+  Reading View Styles
+------------------------------- */
+
+/* Styles the value cells of a table with calculated values */
+div.el-table > table tr.stm-row > td.stm-cell.stm-value,
+div.el-table > table tr.stm-row > td.stm-cell > .stm-value {
 	font-weight: calc(var(--font-weight) + var(--bold-modifier));
 }
-div.el-table > table tr.stm:last-of-type:not(.off) {
+
+/* Styles the last row of a table with calculated values */
+div.el-table > table tr.stm-row:last-of-type:not(.off) {
 	background-color: var(--background-secondary);
 }
