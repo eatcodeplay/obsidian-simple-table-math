@@ -2,10 +2,10 @@
   Source / Live View Styles
 ------------------------------- */
 
-/* Styles the value cells of a table with calculated values */
+/* Styles the cells of a table with calculated values */
 div.markdown-rendered table.table-editor tr > td.stm-cell.stm-value,
 div.markdown-rendered table.table-editor tr > td.stm-cell > .stm-value {
-	padding: 4px 12px;
+	padding: var(--size-2-2) var(--size-4-2); /* must be the same as the original .table-cell-wrapper */
 	font-weight: calc(var(--font-weight) + var(--bold-modifier));
 }
 
@@ -18,7 +18,7 @@ div.markdown-rendered table.table-editor tr.stm-row:last-of-type:not(.off) {
   Reading View Styles
 ------------------------------- */
 
-/* Styles the value cells of a table with calculated values */
+/* Styles the cells of a table with calculated values */
 div.el-table > table tr.stm-row > td.stm-cell.stm-value,
 div.el-table > table tr.stm-row > td.stm-cell > .stm-value {
 	font-weight: calc(var(--font-weight) + var(--bold-modifier));

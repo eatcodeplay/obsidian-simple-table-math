@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-simple-table-math",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Do some math (sum, average, etc.) in your markdown tables for Obsidian (https://obsidian.md).",
 	"main": "src/main.js",
 	"scripts": {

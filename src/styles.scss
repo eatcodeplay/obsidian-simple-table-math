@@ -1,7 +1,7 @@
 div.markdown-rendered table.table-editor {
 	tr > td.stm-cell {
 		&.stm-value, & > .stm-value {
-			padding: 4px 12px;
+			padding: var(--size-2-2) var(--size-4-2); // must be the same as the original .table-cell-wrapper
 			font-weight: calc(var(--font-weight) + var(--bold-modifier));
 
 			& + .table-cell-wrapper	{

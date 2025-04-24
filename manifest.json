@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-simple-table-math",
 	"name": "Simple Table Math",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"minAppVersion": "1.8.9",
 	"description": "Do some math (sum, average, etc.) in your markdown tables.",
 	"author": "Sandro Ducceschi",
