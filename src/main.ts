@@ -10,6 +10,7 @@ import {
 	Notice,
 	Plugin,
 	PluginSettingTab,
+	sanitizeHTMLToDom,
 	Setting,
 	Workspace,
 } from 'obsidian';
@@ -29,15 +30,6 @@ const DEFAULT_SETTINGS: SimpleTableMathSettings = {
 	styleLastRow: true,
 }
 
-//----------------------------------
-// DocumentFragment Helper
-//----------------------------------
-const createFragment = (htmlstr: string) => {
-	const tempElement = document.createElement('template');
-	tempElement.innerHTML = htmlstr;
-	return tempElement.content as DocumentFragment;
-}
-
 /**
  * A plugin that performs mathematical operations on Markdown tables in Obsidian.
  * The plugin actively listens to user interactions and processes table data accordingly.
@@ -49,11 +41,13 @@ export default class SimpleTableMath extends Plugin {
 	//
 	//---------------------------------------------------
 	workspace: Workspace;
+	settings: SimpleTableMathSettings;
+
 	layoutChangeEventRef: EventRef;
 	editorChangeEventRef: EventRef;
 	editorMenuEventRef: EventRef;
 	debouncedProcessing: () => void;
-	settings: SimpleTableMathSettings;
+
 	preventProcessing: boolean = false;
 	forceProcessing: boolean = false;
 
@@ -224,7 +218,7 @@ export default class SimpleTableMath extends Plugin {
 									cell.tabIndex = -1;
 									cell.closest('tr')?.classList.add(...rowClasses);
 									const defaultLocale = getLanguage();
-									vElement.innerText = result.toLocaleString(this.settings.locale || defaultLocale, {
+									vElement.textContent = result.toLocaleString(this.settings.locale || defaultLocale, {
 										style: currency ? 'currency' : 'decimal',
 										currency: currency || undefined,
 										minimumFractionDigits: this.settings.fractions,
@@ -275,17 +269,14 @@ export default class SimpleTableMath extends Plugin {
 	// UI Methods
 	//----------------------------------
 	showNotice(message: string, icon: string | null = null, duration: number = 1000) {
-		let svg = '';
+		const fragment = sanitizeHTMLToDom(`<span class="stm-notice">${message}</span>`);
 		if (icon) {
-			const svgEl = getIcon(icon);
-			if (svgEl) {
-				svg = svgEl.outerHTML;
+			const svg = getIcon(icon);
+			if (svg) {
+				fragment.prepend(svg);
 			}
 		}
-		new Notice(
-			createFragment(`${svg}<span class="stm-notice">${message}</span>`),
-			duration,
-		);
+		new Notice(fragment, duration);
 	}
 
 	//----------------------------------
@@ -406,7 +397,7 @@ class SettingTab extends PluginSettingTab {
 		const language = getLanguage();
 		new Setting(containerEl)
 			.setName('Number formatting')
-			.setDesc(createFragment(`Enter a locale code (language tag like en, en-US, or de-CH) to customize how numbers are formatted, (e.g., decimal separators, thousands separators).<br/><br/>If left empty, the current Obsidian app language ("${language}") will be used for number formatting.<br/><a href="https://en.wikipedia.org/wiki/Language_code" target="_blank">Learn more about language codes</a>`))
+			.setDesc(sanitizeHTMLToDom(`Enter a locale code (language tag like en, en-US, or de-CH) to customize how numbers are formatted, (e.g., decimal separators, thousands separators).<br/><br/>If left empty, the current Obsidian app language ("${language}") will be used for number formatting.<br/><a href="https://en.wikipedia.org/wiki/Language_code" target="_blank">Learn more about language codes</a>`))
 			.addText(text => text
 				.setPlaceholder(`e.g.: en, en-US, de-CH`) // Using the clearer example format
 				.setValue(this.plugin.settings.locale || '')
@@ -417,7 +408,7 @@ class SettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Highlight last row calculations')
-			.setDesc(createFragment(`Enable styling for the last row in tables that contain calculations.<br/><a href="https://github.com/eatcodeplay/obsidian-simple-table-math#css-look--feel" target="_blank">Learn more about styling the results</a>`))
+			.setDesc(sanitizeHTMLToDom(`Enable styling for the last row in tables that contain calculations.<br/><a href="https://github.com/eatcodeplay/obsidian-simple-table-math#css-look--feel" target="_blank">Learn more about styling the results</a>`))
 			.addToggle(component => component
 				.setValue(this.plugin.settings.styleLastRow)
 				.onChange(async (value) => {
