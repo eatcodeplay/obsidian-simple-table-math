@@ -1,18 +1,17 @@
 import {
 	App,
 	debounce,
-	EventRef,
 	getIcon,
 	getLanguage,
+	KeymapEventHandler,
 	MarkdownView,
 	Menu,
 	MenuItem,
-	Notice,
+	Notice, Platform,
 	Plugin,
 	PluginSettingTab,
 	sanitizeHTMLToDom,
 	Setting,
-	Workspace,
 } from 'obsidian';
 
 //----------------------------------
@@ -40,14 +39,10 @@ export default class SimpleTableMath extends Plugin {
 	//  Variables
 	//
 	//---------------------------------------------------
-	workspace: Workspace;
 	settings: SimpleTableMathSettings;
 
-	layoutChangeEventRef: EventRef;
-	editorChangeEventRef: EventRef;
-	editorMenuEventRef: EventRef;
+	keymapHandlers: KeymapEventHandler[] = [];
 	debouncedProcessing: () => void;
-
 	preventProcessing: boolean = false;
 	forceProcessing: boolean = false;
 
@@ -57,36 +52,41 @@ export default class SimpleTableMath extends Plugin {
 	//
 	//---------------------------------------------------
 	async onload() {
+		const app: App = this.app;
+		const workspace = app.workspace;
+
 		await this.loadSettings();
 		this.addSettingTab(new SettingTab(this.app, this));
 
-		const app: App = this.app;
-		this.workspace = app.workspace;
 		this.debouncedProcessing = debounce(this.process.bind(this), 250);
 
-		this.editorChangeEventRef = this.workspace.on('layout-change', this.debouncedProcessing);
-		this.layoutChangeEventRef = this.workspace.on('editor-change', this.debouncedProcessing);
-		this.editorMenuEventRef = this.workspace.on('editor-menu', this.handleEditorMenuEvent.bind(this));
+		workspace.onLayoutReady(() => {
+			this.registerEvent(workspace.on('layout-change', this.debouncedProcessing));
+			this.registerEvent(workspace.on('editor-change', this.debouncedProcessing));
+			this.registerEvent(workspace.on('editor-menu', this.handleEditorMenuEvent.bind(this)));
 
-		app.scope.register(null, 'Tab', this.debouncedProcessing);
-		app.scope.register(null, 'ArrowLeft', this.debouncedProcessing);
-		app.scope.register(null, 'ArrowUp', this.debouncedProcessing);
-		app.scope.register(null, 'ArrowRight', this.debouncedProcessing);
-		app.scope.register(null, 'ArrowDown', this.debouncedProcessing);
+			this.keymapHandlers = [
+				app.scope.register(null, 'Tab', this.debouncedProcessing),
+				app.scope.register(null, 'ArrowLeft', this.debouncedProcessing),
+				app.scope.register(null, 'ArrowUp', this.debouncedProcessing),
+				app.scope.register(null, 'ArrowRight', this.debouncedProcessing),
+				app.scope.register(null, 'ArrowDown', this.debouncedProcessing),
+			]
 
-		this.registerDomEvent(document, 'click', this.debouncedProcessing);
-		this.registerDomEvent(document, 'keydown', this.handleKeyDownEvent.bind(this));
+			this.registerDomEvent(document, 'click', this.debouncedProcessing);
+			this.registerDomEvent(document, 'keydown', this.handleKeyDownEvent.bind(this));
+		});
 
-		this.workspace.on('file-open', () => {
+		this.registerEvent(workspace.on('file-open', () => {
 			this.forceProcessing = true;
 			this.debouncedProcessing();
-		});
+		}));
 	}
 
 	onunload() {
-		this.workspace.offref(this.layoutChangeEventRef);
-		this.workspace.offref(this.editorChangeEventRef);
-		this.workspace.offref(this.editorMenuEventRef);
+		this.keymapHandlers.forEach((handler) => {
+			this.app.scope.unregister(handler);
+		});
 	}
 
 	//---------------------------------------------------
@@ -299,8 +299,7 @@ export default class SimpleTableMath extends Plugin {
 	}
 
 	handleKeyDownEvent(evt: KeyboardEvent) {
-		const isCopy = (evt.ctrlKey || evt.metaKey) && evt.key === 'c';
-		if (isCopy) {
+		if (this.isCopyShortcut(evt)) {
 			this.process();
 			const cell = document.activeElement?.closest('td.stm-cell, th.stm-cell');
 			if (cell) {
@@ -360,6 +359,13 @@ export default class SimpleTableMath extends Plugin {
 			return false;
 		}
 		return parentNode.contains(document.activeElement);
+	}
+
+	isCopyShortcut(evt: KeyboardEvent) {
+		if (Platform.isMacOS) {
+			return evt.metaKey && evt.key === 'c' && !evt.altKey && !evt.shiftKey;
+		}
+		return evt.ctrlKey && evt.key === 'c' && !evt.altKey && !evt.shiftKey;
 	}
 }
 
