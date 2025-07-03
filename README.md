@@ -100,11 +100,20 @@ You can find an example CSS snippet in the [snippet.css](https://github.com/eatc
 
 ## Installation
 
-This plugin is currently not available in the Obsidian Community Plugins.
+### From the Obsidian Community Plugins Tab:
+
+1.  Open Obsidian.
+2.  Go to `Settings` -> `Community plugins`.
+3.  Make sure `Safe mode` is off.
+4.  Click `Browse` and search for "Simple Table Math".
+5.  Click `Install` and then `Enable` the plugin.
+
+### Manually:
+
 You can install it either by using [BRAT](https://obsidian.md/plugins?id=obsidian42-brat) or manually by following the instructions below:
 
 1.  Download the latest release from the [Releases](https://github.com/eatcodeplay/obsidian-simple-table-math/releases) page.
-2.  Extract the downloaded ZIP content into a new folder in your Obsidian vault's plugins folder (e.g., `<your_vault>/.obsidian/plugins/obsidian-simple-table-math`).
+2.  Extract the downloaded ZIP content into a new folder in your Obsidian vault's plugins folder (e.g., `<your_vault>/.obsidian/plugins/simple-table-math`).
 3.  **Note:** On some operating systems, the `.obsidian` folder might be hidden. Make sure to show hidden files in your file explorer.
 4.  Open Obsidian.
 5.  Go to `Settings` -> `Community plugins`.
