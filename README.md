@@ -20,9 +20,12 @@ The tag follows this format: `[operation][direction][start:end][currency]`
 	* `MAX`: Finds the maximum value.
 	* `SUB`: Subtracts the subsequent values from the first value.
 	* `MUL`: Multiplies all the values together.
+	* `DIV`: Divides the first value by each subsequent value in sequence.
 * **`[direction]`**: Indicates the direction of the values to operate on:
 	* `^`: Looks at the cells above the current cell in the same column.
 	* `<`: Looks at the cells to the left of the current cell in the same row.
+	* `v`: Looks at the cells below the current cell in the same column.
+	* `>`: Looks at the cells to the right of the current cell in the same row.
 * **`[start:end]`** (Optional): Specifies a range of cells to include in the calculation.
 	* If omitted, it defaults to all applicable cells in the specified direction.
 	* Use a colon-separated format (e.g., `1:3` for the first three cells). The indices are 1-based.
@@ -66,7 +69,7 @@ The tag follows this format: `[operation][direction][start:end][currency]`
 ## Key Features
 
 * **Real-time Updates:** Calculations are performed automatically as you type and edit your tables.
-* **Directional Operations:** Calculate based on values above or to the left of the tag.
+* **Directional Operations:** Calculate based on values relative to the tag.
 * **Optional Range Selection:** Target specific cells for your calculations.
 * **Currency Formatting:** Display results with currency symbols for better readability.
 * **Locale-Aware Formatting:** Respects your system's locale for number formatting by default, with an option to override.

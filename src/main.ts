@@ -29,6 +29,17 @@ const DEFAULT_SETTINGS: SimpleTableMathSettings = {
 	styleLastRow: true,
 }
 
+const OperationSymbols = ["sum", "avg", "min", "max", "sub", "mul", "div"] as const;
+type OperationSymbol = typeof OperationSymbols[number];
+
+const DirectionSymbols = ["<", "^", ">", "v"] as const;
+type DirectionSymbol = (typeof DirectionSymbols)[number];
+
+const TABLE_MATH_REGEX = new RegExp(
+	`^(${OperationSymbols.join('|')})([${DirectionSymbols.join('')}])(\\d+)?(?::(\\d+))?([a-z]{2,4})?$`,
+	'i'
+);
+
 /**
  * A plugin that performs mathematical operations on Markdown tables in Obsidian.
  * The plugin actively listens to user interactions and processes table data accordingly.
@@ -129,11 +140,11 @@ export default class SimpleTableMath extends Plugin {
 					const cells = Array.from(row.children) as HTMLTableCellElement[];
 					cells.forEach((cell, colIndex) => {
 						const rawText = this.extractCellContent(cell).trim().toLowerCase() || '';
-						const match = rawText.match(/^([a-z]{3})([<^])(?:(\d+)(?::(\d+))?)?([a-z]{2,4})?$/i);
+						const match = rawText.match(TABLE_MATH_REGEX);
 						const isActiveElement = this.isDocumentActiveElementChildOf(cell)
 						if (match && !isActiveElement) {
-							const operation = match[1].toLowerCase();
-							const direction = match[2];
+							const operation = match[1].toLowerCase() as OperationSymbol;
+							const direction = match[2] as DirectionSymbol;
 							const startStr = match[3];
 							const endStr = match[4];
 							const currency = match[5]?.toUpperCase() || null;
@@ -149,34 +160,46 @@ export default class SimpleTableMath extends Plugin {
 								endIndex = -1;
 							}
 
-							if (direction === '^') {
-								const actualStartRow = Math.max(0, startIndex);
-								const actualEndRow = endIndex !== -1 ? endIndex : rowIndex - 1;
-								const finalEndRow = Math.min(actualEndRow, rowIndex - 1);
-								if (actualStartRow <= finalEndRow) {
-									for (let r = actualStartRow; r <= finalEndRow; r++) {
-										const aboveCell = rows[r]?.children?.[colIndex] as HTMLTableCellElement | undefined | null;
-										const textContent = this.extractCellContent(aboveCell, true);
-										const value = this.extractNumber(textContent);
-										if (value !== null) {
-											values.push(value);
-										}
-									}
+							const getCellValue = (r: number, c: number) => {
+								const cell = rows[r]?.children?.[c] as HTMLTableCellElement | undefined | null;
+								const text = this.extractCellContent(cell, true);
+								return this.extractNumber(text);
+							};
+							let range: number[] = [];
+							const isEndIndexSet = endIndex !== -1;
+							switch (direction) {
+								case '^': { // Up
+									range = Array.from({ length: isEndIndexSet ? Math.min(endIndex, rowIndex - 1) : rowIndex - 1 - startIndex + 1 }, 
+										(_, i) => startIndex + i);
+									break;
 								}
-							} else if (direction === '<') {
-								const actualStartCol = Math.max(0, startIndex);
-								const actualEndCol = endIndex !== -1 ? endIndex : colIndex - 1;
-								const finalEndCol = Math.min(actualEndCol, colIndex - 1);
-								if (actualStartCol <= finalEndCol) {
-									for (let c = actualStartCol; c <= finalEndCol; c++) {
-										const leftCell = cells[c] as HTMLTableCellElement | undefined | null;
-										const textContent = this.extractCellContent(leftCell, true);
-										const value = this.extractNumber(textContent);
-										if (value !== null) {
-											values.push(value);
-										}
-									}
+								case '<': { // Left
+									range = Array.from({ length:  isEndIndexSet ? Math.min(endIndex, colIndex - 1) : colIndex - 1 - startIndex + 1 }, 
+										(_, i) => startIndex + i);
+									break;
 								}
+								case '>': { // Right
+									range = Array.from({ length: (isEndIndexSet ? Math.min(endIndex, cells.length - 1) : cells.length - 1) - colIndex },
+										(_, i) => colIndex + 1 + i);
+									break;
+								}
+								case 'v': { // Down
+									range = Array.from({ length: (isEndIndexSet ? Math.min(endIndex, rows.length - 1) : rows.length - 1) - rowIndex },
+										(_, i) => rowIndex + 1 + i);
+									break;
+								}
+							}
+
+							if (direction === '^' || direction === 'v') { // Vertical direction
+								range.forEach(r => {
+									const value = getCellValue(r, colIndex);
+									if (value !== null) values.push(value);
+								});
+							} else { // Horizontal direction
+								range.forEach(c => {
+									const value = getCellValue(rowIndex, c);
+									if (value !== null) values.push(value);
+								});
 							}
 
 							let result: number | null = null;
