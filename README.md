@@ -28,6 +28,8 @@ The tag follows this format: `[operation][direction][start:end][currency]`
 	* Use a colon-separated format (e.g., `1:3` for the first three cells). The indices are 1-based.
 	* You can also just specify a start (e.g., `2`).
 * **`[currency]`** (Optional): A 2-4 letter currency code (e.g., `USD`, `EUR`, `GBP`). If provided, the result will be formatted with the specified currency symbol.
+* **`[format]`** (Optional): Format options for input and output.
+	* #e[n] Only accepts inputs written in scientific notations, and outputs results in scientific notation with n fraction digits. 
 
 ## Examples
 
@@ -63,6 +65,20 @@ The tag follows this format: `[operation][direction][start:end][currency]`
 | **TOTAL:**  |        |          | SUM^2:4USD |
 ```
 
+**Scientific notation example:**
+
+Note: when using #e[n] format the input values must be in scientific notation and cannot include currency units.
+```
+| Correct | Incorrect |
+| ------: | --------: |
+|    1000 |     1,000 |
+|    -1.0 |      -1,0 |
+|   2.0e1 |       $20 |
+|     0.1 |       0,1 |
+|    1E-1 |      10 % |
+| SUM^#e4 |   SUM^#e4 |
+```
+The correct column will ouput 1.0192e+3 while the incorrect column will output 0.0000e+0.
 ## Key Features
 
 * **Real-time Updates:** Calculations are performed automatically as you type and edit your tables.
