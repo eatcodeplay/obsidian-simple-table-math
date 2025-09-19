@@ -124,13 +124,16 @@ export default class SimpleTableMath extends Plugin {
 				...(this.settings.styleLastRow ? [] :  ['off']),
 			];
 
+			const defaultNumRegex = /-?\d+(?:[.,'’`\u202f]\d{3})*(?:[.,]\d+)?/;
+			const exponentialRegex = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
+						
 			tables.forEach((table) => {
 				const rows = Array.from(table.querySelectorAll('tr'));
 				rows.forEach((row, rowIndex) => {
 					const cells = Array.from(row.children) as HTMLTableCellElement[];
 					cells.forEach((cell, colIndex) => {
 						const rawText = this.extractCellContent(cell).trim().toLowerCase() || '';
-						const match = rawText.match(/^([a-z]{3})([<^])(?:(\d+)(?::(\d+))?)?([a-z]{2,4})?$/i);
+						const match = rawText.match(/^([a-z]{3})([<^])(?:(\d+)(?::(\d+))?)?([a-z]{2,4})?(?:\#e(\d+))?$/i);
 						const isActiveElement = this.isDocumentActiveElementChildOf(cell)
 						if (match && !isActiveElement) {
 							const operation = match[1].toLowerCase();
@@ -138,6 +141,8 @@ export default class SimpleTableMath extends Plugin {
 							const startStr = match[3];
 							const endStr = match[4];
 							const currency = match[5]?.toUpperCase() || null;
+							const exponential = match[6] ? parseInt(match[6], 10) : 0;
+							const numRegex = exponential ? exponentialRegex : defaultNumRegex;
 							const values: number[] = [];
 
 							let startIndex = startStr ? parseInt(startStr, 10) - 1 : 0;
@@ -158,7 +163,7 @@ export default class SimpleTableMath extends Plugin {
 									for (let r = actualStartRow; r <= finalEndRow; r++) {
 										const aboveCell = rows[r]?.children?.[colIndex] as HTMLTableCellElement | undefined | null;
 										const textContent = this.extractCellContent(aboveCell, true);
-										const value = this.extractNumber(textContent);
+										const value = this.extractNumber(textContent, numRegex);
 										if (value !== null) {
 											values.push(value);
 										}
@@ -172,7 +177,7 @@ export default class SimpleTableMath extends Plugin {
 									for (let c = actualStartCol; c <= finalEndCol; c++) {
 										const leftCell = cells[c] as HTMLTableCellElement | undefined | null;
 										const textContent = this.extractCellContent(leftCell, true);
-										const value = this.extractNumber(textContent);
+										const value = this.extractNumber(textContent, numRegex);
 										if (value !== null) {
 											values.push(value);
 										}
@@ -219,12 +224,16 @@ export default class SimpleTableMath extends Plugin {
 									cell.tabIndex = -1;
 									cell.closest('tr')?.classList.add(...rowClasses);
 									const defaultLocale = getLanguage();
-									vElement.textContent = result.toLocaleString(this.settings.locale || defaultLocale, {
-										style: currency ? 'currency' : 'decimal',
-										currency: currency || undefined,
-										minimumFractionDigits: this.settings.fractions,
-										maximumFractionDigits: this.settings.fractions,
-									});
+									if (exponential) {
+										vElement.textContent = result.toExponential(exponential)
+									} else {
+										vElement.textContent = result.toLocaleString(this.settings.locale || defaultLocale, {
+											style: currency ? 'currency' : 'decimal',
+											currency: currency || undefined,
+											minimumFractionDigits: this.settings.fractions,
+											maximumFractionDigits: this.settings.fractions,
+										})
+									}; 
 								}
 							}
 						} else if (!isActiveElement && cell.classList.contains('stm-cell')) {
@@ -333,12 +342,11 @@ export default class SimpleTableMath extends Plugin {
 		return wrapper?.textContent || '';
 	}
 
-	extractNumber(str: string | null): number | null {
+	extractNumber(str: string | null, numRegex: RegExp): number | null{
 		if (!str) {
 			return null;
 		}
-
-		const match = str.match(/-?\d+(?:[.,'’`\u202f]\d{3})*(?:[.,]\d+)?/);
+		const match = str.match(numRegex);
 		if (!match) {
 			return null;
 		}
