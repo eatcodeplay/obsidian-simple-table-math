@@ -13,6 +13,7 @@ import {
 	sanitizeHTMLToDom,
 	Setting,
 } from 'obsidian';
+import numeral from 'numeral';
 
 //----------------------------------
 // Interfaces
@@ -332,7 +333,7 @@ export default class SimpleTableMath extends Plugin {
 		return wrapper?.textContent || '';
 	}
 
-	extractNumber(str: string | null): number | null{
+	extractNumber(str: string | null): number | null {
 		if (!str) {
 			return null;
 		}
@@ -343,15 +344,7 @@ export default class SimpleTableMath extends Plugin {
 		}
 
 		let numStr = match[0].replace(/['’`\u202f]/g, '');
-		const commaIndex = numStr.lastIndexOf(',');
-		const dotIndex = numStr.lastIndexOf('.');
-		if (commaIndex > dotIndex) {
-			numStr = numStr.replace(/\./g, '').replace(',', '.');
-		} else {
-			numStr = numStr.replace(/,/g, '');
-		}
-		const result = parseFloat(numStr);
-		return !isNaN(result) ? result : null;
+		return numeral(numStr).value();
 	}
 
 	isDocumentActiveElementChildOf(parentNode: HTMLElement): boolean {
