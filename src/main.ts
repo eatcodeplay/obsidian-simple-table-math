@@ -22,12 +22,14 @@ interface SimpleTableMathSettings {
 	fractions: number;
 	locale: string | null;
 	styleLastRow: boolean;
+	skipHeaderRow: boolean;
 }
 
 const DEFAULT_SETTINGS: SimpleTableMathSettings = {
 	fractions: 2,
 	locale: null,
 	styleLastRow: true,
+	skipHeaderRow: false,
 }
 
 /**
@@ -156,7 +158,8 @@ export default class SimpleTableMath extends Plugin {
 							}
 
 							if (direction === '^') {
-								const actualStartRow = Math.max(0, startIndex);
+								const minStartRow = this.settings.skipHeaderRow ? 1 : 0;
+								const actualStartRow = Math.max(minStartRow, startIndex);
 								const actualEndRow = endIndex !== -1 ? endIndex : rowIndex - 1;
 								const finalEndRow = Math.min(actualEndRow, rowIndex - 1);
 								if (actualStartRow <= finalEndRow) {
@@ -420,6 +423,16 @@ class SettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.styleLastRow)
 				.onChange(async (value) => {
 					this.plugin.settings.styleLastRow = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Skip header row')
+			.setDesc('When enabled, the first row of each table will be excluded from vertical (^) calculations. Useful when your header row contains numbers.')
+			.addToggle(component => component
+				.setValue(this.plugin.settings.skipHeaderRow)
+				.onChange(async (value) => {
+					this.plugin.settings.skipHeaderRow = value;
 					await this.plugin.saveSettings();
 				}));
 	}
