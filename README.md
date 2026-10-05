@@ -1,3 +1,7 @@
+> [!IMPORTANT]  
+> Since the developer stopped using Obsidian. This repository has been archived.
+
+
 # Simple Table Math
 
 A plugin for Obsidian that performs mathematical operations on Markdown tables.
