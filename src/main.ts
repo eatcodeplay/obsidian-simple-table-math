@@ -205,6 +205,16 @@ export default class SimpleTableMath extends Plugin {
 										result = result / values[i];
 									}
 								}
+							} else if (operation === 'med' && values.length > 0) {
+									const sorted = [...values].sort((a, b) => a - b);
+									const mid = Math.floor(sorted.length / 2);
+									if (sorted.length % 2 === 0) {
+										// Even number of elements: average the two middle values
+										result = (sorted[mid - 1] + sorted[mid]) / 2;
+									} else {
+										// Odd number of elements: return the middle value
+										result = sorted[mid];
+									}
 							}
 
 							if (result !== null) {
